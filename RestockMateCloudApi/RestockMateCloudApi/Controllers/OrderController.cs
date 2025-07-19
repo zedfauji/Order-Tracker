@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using RestockMateCloudApi.Models;
 using Google.Cloud.Firestore;
 using Google.Apis.Auth.OAuth2;
+using System.Text.Json;
+
 
 namespace RestockMateCloudApi.Controllers
 {
@@ -24,11 +26,14 @@ namespace RestockMateCloudApi.Controllers
 
         [HttpPost("submitOrder")]
         public async Task<IActionResult> SubmitOrder([FromBody] OrderDto order)
-        {   
+        {
             order.SubmittedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
             DocumentReference docRef = _firestoreDb.Collection("orders").Document();
+            Console.WriteLine($"Received order: {JsonSerializer.Serialize(order)}");
+            Console.WriteLine($"Items count: {order.Items?.Count}");
             await docRef.SetAsync(order);
             return Ok(order);
+            
         }
 
         [HttpGet("orders")]
@@ -42,13 +47,24 @@ namespace RestockMateCloudApi.Controllers
         [HttpPost("updateOrderStatus")]
         public async Task<IActionResult> UpdateOrderStatus([FromBody] StatusUpdateDto update)
         {
-            DocumentReference docRef = _firestoreDb.Collection("orders").Document(update.Id);
-            await docRef.UpdateAsync(new Dictionary<string, object>
+            try
             {
-                { "Status", update.NewStatus },
-                { "StatusUpdatedAt", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") }
-            });
-            return Ok(new { success = true });
+                DocumentReference docRef = _firestoreDb.Collection("orders").Document(update.Id);
+                await docRef.UpdateAsync(new Dictionary<string, object>
+                {
+                    { "Status", update.NewStatus },
+                    { "StatusUpdatedAt", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") }
+                });
+                return Ok(new { success = true });
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" Status update failed: " + ex.Message);
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+
+            
         }
         [HttpGet("getOrders")]
         public async Task<IActionResult> GetOrders([FromQuery] string? employeeName)
@@ -67,6 +83,7 @@ namespace RestockMateCloudApi.Controllers
 
             return Ok(results);
         }
+        
 
 
         public class UpdateRequest

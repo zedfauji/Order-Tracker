@@ -22,6 +22,9 @@
         private System.Windows.Forms.ToolStripMenuItem addMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteMenuItem;
+        private ComboBox roleBox;
+        private ComboBox statusBox;
+        private Button updateStatusButton;
 
         protected override void Dispose(bool disposing)
         {
@@ -107,6 +110,31 @@
             this.historyGridView.AllowUserToDeleteRows = false;
             this.historyGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             this.historyTab.Controls.Add(this.historyGridView);
+            this.historyTab.Controls.Add(this.roleBox);
+            this.historyTab.Controls.Add(this.statusBox);
+            this.historyTab.Controls.Add(this.updateStatusButton);
+
+            // Role selector
+            this.roleBox = new ComboBox();
+            this.roleBox.Location = new System.Drawing.Point(10, 540);
+            this.roleBox.Size = new System.Drawing.Size(150, 25);
+            this.roleBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.roleBox.Items.AddRange(new string[] { "Employee", "Administrator" });
+            this.roleBox.SelectedIndex = 0;
+            this.roleBox.SelectedIndexChanged += new EventHandler(this.roleBox_SelectedIndexChanged);
+
+            // Status selector
+            this.statusBox = new ComboBox();
+            this.statusBox.Location = new System.Drawing.Point(170, 540);
+            this.statusBox.Size = new System.Drawing.Size(150, 25);
+            this.statusBox.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            // Update button
+            this.updateStatusButton = new Button();
+            this.updateStatusButton.Location = new System.Drawing.Point(330, 540);
+            this.updateStatusButton.Size = new System.Drawing.Size(130, 25);
+            this.updateStatusButton.Text = "Update Status";
+            this.updateStatusButton.Click += new System.EventHandler(this.UpdateStatusButton_Click);
 
             // Add controls back to form
             this.Controls.Clear();

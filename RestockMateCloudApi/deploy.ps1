@@ -14,7 +14,6 @@ $serviceName = "restock-api"
 $region = "us-central1"
 
 # 🧭 Authenticate with Google Cloud (assumes gcloud CLI is installed)
-gcloud auth login
 gcloud config set project $projectId
 
 # 🔨 Build and deploy using Cloud Run (from local source)

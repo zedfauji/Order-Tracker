@@ -13,7 +13,6 @@ namespace RestockMateApp
 
         public static void InitializeDatabase()
         {
-            MessageBox.Show("Looking for DB here:\n" + dbPath);
             using var connection = new SqliteConnection(connectionString);
             connection.Open();
 

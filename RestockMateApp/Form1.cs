@@ -3,7 +3,9 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RestockMateApp
@@ -25,6 +27,7 @@ namespace RestockMateApp
                 ToolStripMenuItem addMenuItem = new ToolStripMenuItem("➕ Add New Item");
                 ToolStripMenuItem editMenuItem = new ToolStripMenuItem("✏️ Edit Selected");
                 ToolStripMenuItem deleteMenuItem = new ToolStripMenuItem("❌ Delete Selected");
+                
 
                 inventoryContextMenu.Items.AddRange(new ToolStripItem[] {
                     addMenuItem, editMenuItem, deleteMenuItem
@@ -72,7 +75,7 @@ namespace RestockMateApp
         }
 
         private async void submitOrderButton_Click(object sender, EventArgs e)
-        {   
+        {
             var itemsToSubmit = new List<ItemDto>();
             string employeeName = employeeNameBox.Text.Trim();
             if (string.IsNullOrEmpty(employeeName))
@@ -98,16 +101,18 @@ namespace RestockMateApp
                         string item = row["Item Name"]?.ToString() ?? "";
                         string quantity = row.Table.Columns.Contains("Order Quantity") ? row["Order Quantity"]?.ToString() ?? "0" : "0";
                         int parsedQty = int.TryParse(quantity, out int result) ? result : 0;
+
                         if (parsedQty > 0)
                         {
                             itemsToSubmit.Add(new ItemDto { Name = item, Quantity = parsedQty });
                             DBHelper.LogOrderToDatabase(orderDate, employeeName, item, parsedQty);
-                        }
-
-                        DBHelper.LogOrderToDatabase(orderDate, employeeName, item, parsedQty);
-
-                        if (!string.IsNullOrWhiteSpace(quantity) && quantity != "0")
                             writer.WriteLine($"{orderDate},{employeeName},{item},{quantity}");
+                        }
+                    }
+                    if (itemsToSubmit.Count == 0)
+                    {
+                        MessageBox.Show("No items to submit.");
+                        return;
                     }
                     var orderDto = new OrderDto
                     {
@@ -115,16 +120,11 @@ namespace RestockMateApp
                         Items = itemsToSubmit,
                         Status = "Placed"
                     };
+                    orderDto.Id = Guid.NewGuid().ToString();
                     bool success = await CloudOrderClient.SubmitOrderAsync(orderDto);
-                    if (!success)
-                    {
-                        MessageBox.Show("Failed to submit order to cloud.");
-                        return;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Order submitted successfully to cloud.");
-                    }
+                    MessageBox.Show(success
+                        ? "Order submitted successfully to cloud."
+                        : "Failed to submit order to cloud.");
                 }
 
                 MessageBox.Show($"✅ Order saved successfully!\n\nFile saved at:\n{logPath}");
@@ -183,26 +183,63 @@ namespace RestockMateApp
 
         private async void tabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (tabControl.SelectedTab == myOrdersTab)
+            if (tabControl.SelectedTab == historyTab)
             {
-                string employee = employeeNameBox.Text.Trim();
-                var orders = await CloudOrderFetcher.FetchOrdersAsync(); // 🔁 No filter
-
-                var table = new DataTable();
-                table.Columns.Add("Submitted At");
-                table.Columns.Add("Status");
-                table.Columns.Add("Item");
-                table.Columns.Add("Quantity");
-
-                foreach (var order in orders)
+                try
                 {
-                    foreach (var item in order.Items)
-                    {
-                        table.Rows.Add(order.SubmittedAt, order.Status, item.Name, item.Quantity);
-                    }
-                }
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                myOrderGridView.DataSource = table;
+                    var orders = await CloudOrderFetcher.FetchOrdersAsync(); // 🔄 Firestore orders
+                    if (orders == null || orders.Count == 0)
+                    {
+                        MessageBox.Show("No orders found in Firestore.");
+                        return;
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Found {orders.Count} orders in Firestore.");
+                    }
+                    
+                    var table = new DataTable();
+                    table.Columns.Add("Submitted At");
+                    table.Columns.Add("Employee");
+                    table.Columns.Add("Status");
+                    table.Columns.Add("Item");
+                    table.Columns.Add("Quantity");
+
+                    foreach (var order in orders)
+                    {
+                        //if (order?.Items == null) continue;
+                        if (order.Items == null || order.Items.Count == 0)
+                        {
+                            MessageBox.Show($" Skipping order from {order?.EmployeeName} — Items is null or empty.");
+
+                            continue;
+                        }
+                        foreach (var item in order.Items)
+                        {
+                           //MessageBox.Show($" - {item.Name}: {item.Quantity}");
+                            table.Rows.Add(
+                                order.SubmittedAt ?? "N/A",
+                                order.EmployeeName ?? "Unknown",
+                                order.Status ?? "Unknown",
+                                item.Name ?? "Unnamed",
+                                item.Quantity
+                            );
+                        }
+                    }
+
+                    historyGridView.DataSource = table;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(" Failed to load orders from Firestore:\n" + ex.Message);
+                }
+            }
+
+            if (tabControl.SelectedTab == orderTab)
+            {
+                LoadItemsFromDatabase(); // Refresh inventory for placing orders
             }
         }
     }

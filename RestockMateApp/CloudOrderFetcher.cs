@@ -9,21 +9,16 @@ namespace RestockMateApp
     public class CloudOrderFetcher
     {
         private static readonly HttpClient client = new HttpClient();
-        private const string apiUrl = "https://restock-api-904541739138.us-central1.run.app/order/getOrders"; // 🔁 Update with your actual endpoint
+        private const string apiUrl = "https://restock-api-904541739138.us-central1.run.app/order/getOrders";
 
-        public static async Task<List<OrderDto>> FetchOrdersAsync(string? employeeName = null)
+        public static async Task<List<OrderDto>> FetchOrdersAsync()
         {
             try
             {
-                string url = string.IsNullOrEmpty(employeeName)
-                    ? apiUrl
-                    : $"{apiUrl}?employeeName={Uri.EscapeDataString(employeeName)}";
-
-                var response = await client.GetAsync(url);
+                var response = await client.GetAsync(apiUrl);
                 var responseBody = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine("📥 Firestore Response:");
-                Console.WriteLine(responseBody);
+                //MessageBox.Show(responseBody);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -32,13 +27,13 @@ namespace RestockMateApp
                 }
                 else
                 {
-                    Console.WriteLine($"❌ Status: {response.StatusCode}");
+                    MessageBox.Show($"❌ Status: {response.StatusCode}");
                     return new List<OrderDto>();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("🚨 Fetch Exception: " + ex.Message);
+                MessageBox.Show("🚨 Fetch Exception: " + ex.Message);
                 return new List<OrderDto>();
             }
         }

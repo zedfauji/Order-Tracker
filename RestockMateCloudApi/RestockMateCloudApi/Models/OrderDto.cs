@@ -1,4 +1,5 @@
 using Google.Cloud.Firestore;
+using System.Text.Json.Serialization;
 
 namespace RestockMateCloudApi.Models
 {
@@ -33,7 +34,9 @@ namespace RestockMateCloudApi.Models
     }
     public class StatusUpdateDto
     {
+        [JsonPropertyName("id")]
         public string Id { get; set; }
+        [JsonPropertyName("newStatus")]
         public string NewStatus { get; set; }
     }
 }
