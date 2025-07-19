@@ -1,0 +1,6 @@
+@RestockMateCloudApi_HostAddress = http://localhost:5217
+
+GET {{RestockMateCloudApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

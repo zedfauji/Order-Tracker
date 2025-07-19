@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "20XM2zSz1OBQi+Kvb46K3erX2W+ygbL0rBoHf21CA5Y=",
+  "Source": "RestockMateCloudApi",
+  "BasePath": "_content/RestockMateCloudApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
