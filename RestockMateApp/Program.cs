@@ -9,7 +9,7 @@ namespace RestockMateApp
         static void Main()
         {
             ApplicationConfiguration.Initialize(); // Enables default WinForms config
-            Application.Run(new Form1()); // Form1 = MainForm
+            Application.Run(new LoginForm());
         }
     }
 }

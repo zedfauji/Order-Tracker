@@ -91,6 +91,19 @@ namespace RestockMateApp
         public string? SubmittedAt { get; set; } // optional
         [JsonPropertyName("id")]
         public string Id { get; set; }
+        [JsonPropertyName("statusUpdatedAt")]
+        public string StatusUpdatedAt { get; set; }
 
     }
+    public class StatusUpdateDto
+    {
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [JsonPropertyName("newStatus")]
+        public string NewStatus { get; set; }
+        [JsonPropertyName("statusUpdatedAt")]
+        public string StatusUpdatedAt { get; set; }
+    }
+
 }

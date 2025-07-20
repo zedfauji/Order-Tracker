@@ -39,4 +39,16 @@ namespace RestockMateCloudApi.Models
         [JsonPropertyName("newStatus")]
         public string NewStatus { get; set; }
     }
+    public class LoginDto
+    {
+        public string Username { get; set; }
+        public string Passcode { get; set; }
+    }
+
+    public class CreateUserDto
+    {
+        public string Username { get; set; }
+        public string Passcode { get; set; }
+        public string Role { get; set; }
+    }
 }

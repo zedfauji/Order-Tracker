@@ -83,6 +83,52 @@ namespace RestockMateCloudApi.Controllers
 
             return Ok(results);
         }
+        [HttpPost("user/login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto login)
+        {
+            var userRef = _firestoreDb.Collection("users").Document(login.Username);
+            var snapshot = await userRef.GetSnapshotAsync();
+
+            if (!snapshot.Exists)
+                return Unauthorized(new { success = false, error = "User not found." });
+
+            var storedPass = snapshot.GetValue<string>("passcode");
+            if (storedPass != login.Passcode)
+                return Unauthorized(new { success = false, error = "Incorrect passcode." });
+
+            var role = snapshot.GetValue<string>("role");
+            return Ok(new { success = true, role });
+        }
+        [HttpPost("user/createOrUpdate")]
+        public async Task<IActionResult> CreateOrUpdate([FromBody] CreateUserDto dto)
+        {
+            var userData = new Dictionary<string, object>
+            {
+                { "username", dto.Username },
+                { "passcode", dto.Passcode },
+                { "role", dto.Role }
+            };
+
+            await _firestoreDb.Collection("users").Document(dto.Username).SetAsync(userData);
+            return Ok(new { success = true });
+        }
+        [HttpGet("user/list")]
+        public async Task<IActionResult> ListUsers()
+        {
+            var snapshot = await _firestoreDb.Collection("users").GetSnapshotAsync();
+            var users = new List<object>();
+
+            foreach (var doc in snapshot.Documents)
+            {
+                users.Add(new
+                {
+                    username = doc.Id,
+                    role = doc.GetValue<string>("role")
+                });
+            }
+
+            return Ok(users);
+        }
         
 
 

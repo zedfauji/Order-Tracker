@@ -25,6 +25,11 @@
         private ComboBox roleBox;
         private ComboBox statusBox;
         private Button updateStatusButton;
+        private TabPage userTab;
+        private DataGridView userGridView;
+        private TextBox usernameBox, passcodeBox;
+        private ComboBox roleComboBox;
+        private Button addUserButton, updateUserButton, deleteUserButton;
 
         protected override void Dispose(bool disposing)
         {
@@ -34,15 +39,68 @@
         }
 
         private void InitializeComponent()
-        {
+        
+        {   this.roleBox = new ComboBox();
             this.itemGridView = new System.Windows.Forms.DataGridView();
             this.employeeNameBox = new System.Windows.Forms.TextBox();
             this.employeeLabel = new System.Windows.Forms.Label();
             this.submitOrderButton = new System.Windows.Forms.Button();
             this.sendWhatsAppButton = new System.Windows.Forms.Button();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.orderTab = new System.Windows.Forms.TabPage();
+            this.historyTab = new System.Windows.Forms.TabPage();
             ((System.ComponentModel.ISupportInitialize)(this.itemGridView)).BeginInit();
             this.SuspendLayout();
+            // 🛠 User Management Tab
+            this.userTab = new TabPage();
+            this.userTab.Text = "User Management";
+            this.userTab.Visible = false; // Will enable in Form1.cs if admin
 
+            this.userGridView = new DataGridView();
+            this.userGridView.Location = new Point(10, 10);
+            this.userGridView.Size = new Size(760, 300);
+            this.userGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            this.userGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            Label usernameLabel = new Label()
+            {
+                Text = "Username:",
+                Location = new Point(10, 295),
+                Size = new Size(150, 20)
+            };
+
+            Label passcodeLabel = new Label()
+            {
+                Text = "Passcode:",
+                Location = new Point(170, 295),
+                Size = new Size(150, 20)
+            };
+
+            Label roleLabel = new Label()
+            {
+                Text = "Role:",
+                Location = new Point(330, 295),
+                Size = new Size(150, 20)
+            };
+
+            // Inputs
+            this.usernameBox = new TextBox() { Location = new Point(10, 320), Size = new Size(150, 25) };
+            this.passcodeBox = new TextBox() { Location = new Point(170, 320), Size = new Size(150, 25) };
+            this.roleComboBox = new ComboBox() { Location = new Point(330, 320), Size = new Size(150, 25) };
+            roleComboBox.Items.AddRange(new string[] { "Employee", "Administrator" });
+            roleComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            // Buttons
+            this.addUserButton = new Button() { Text = "Add", Location = new Point(490, 320), Size = new Size(80, 25) };
+            this.updateUserButton = new Button() { Text = "Update", Location = new Point(580, 320), Size = new Size(80, 25) };
+            this.deleteUserButton = new Button() { Text = "Delete", Location = new Point(670, 320), Size = new Size(80, 25) };
+            userTab.Controls.AddRange(new Control[] {
+                userGridView, usernameBox, passcodeBox, roleComboBox,
+                addUserButton, updateUserButton, deleteUserButton,
+                usernameLabel, passcodeLabel, roleLabel
+
+            });
+
+            tabControl.Controls.Add(userTab);
             // employeeLabel
             this.employeeLabel.Location = new System.Drawing.Point(20, 20);
             this.employeeLabel.Size = new System.Drawing.Size(110, 25);
@@ -90,6 +148,8 @@
             this.historyTab = new System.Windows.Forms.TabPage();
             this.tabControl.Controls.Add(this.orderTab);
             this.tabControl.Controls.Add(this.historyTab);
+            this.tabControl.Controls.Add(this.userTab);       // ✅ Add user tab here
+
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Size = new System.Drawing.Size(800, 600);
             this.tabControl.SelectedIndexChanged += new EventHandler(this.tabControl_SelectedIndexChanged);
@@ -99,20 +159,6 @@
             this.orderTab.Controls.AddRange(new Control[] {
                 employeeLabel, employeeNameBox, submitOrderButton, sendWhatsAppButton, itemGridView
             });
-
-            // History Tab
-            this.historyTab.Text = "Order History";
-            this.historyGridView = new System.Windows.Forms.DataGridView();
-            this.historyGridView.Location = new System.Drawing.Point(10, 10);
-            this.historyGridView.Size = new System.Drawing.Size(760, 520);
-            this.historyGridView.ReadOnly = true;
-            this.historyGridView.AllowUserToAddRows = false;
-            this.historyGridView.AllowUserToDeleteRows = false;
-            this.historyGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            this.historyTab.Controls.Add(this.historyGridView);
-            this.historyTab.Controls.Add(this.roleBox);
-            this.historyTab.Controls.Add(this.statusBox);
-            this.historyTab.Controls.Add(this.updateStatusButton);
 
             // Role selector
             this.roleBox = new ComboBox();
@@ -135,17 +181,25 @@
             this.updateStatusButton.Size = new System.Drawing.Size(130, 25);
             this.updateStatusButton.Text = "Update Status";
             this.updateStatusButton.Click += new System.EventHandler(this.UpdateStatusButton_Click);
-
-            // Add controls back to form
-            this.Controls.Clear();
-            this.Controls.Add(this.tabControl);
+            // History Tab
+            this.historyTab.Text = "Order History";
+            this.historyGridView = new System.Windows.Forms.DataGridView();
+            this.historyGridView.Location = new System.Drawing.Point(10, 10);
+            this.historyGridView.Size = new System.Drawing.Size(760, 520);
+            this.historyGridView.ReadOnly = true;
+            this.historyGridView.AllowUserToAddRows = false;
+            this.historyGridView.AllowUserToDeleteRows = false;
+            this.historyGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.historyTab.Controls.Add(this.historyGridView);
+            this.historyTab.Controls.Add(this.roleBox);
+            this.historyTab.Controls.Add(this.statusBox);
+            this.historyTab.Controls.Add(this.updateStatusButton);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "RestockMate";
             this.ClientSize = new System.Drawing.Size(800, 600);
             // Third tab
             this.inventoryTab = new System.Windows.Forms.TabPage();
             this.inventoryTab.Text = "Manage Inventory";
-
             // Inventory grid
             this.inventoryGridView = new System.Windows.Forms.DataGridView();
             this.inventoryGridView.Location = new System.Drawing.Point(10, 10);
@@ -153,7 +207,6 @@
             this.inventoryGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             this.inventoryGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             inventoryTab.Controls.Add(this.inventoryGridView);
-
             // Labels + Inputs
             this.nameLabel = new Label() { Text = "Item Name:", Location = new Point(10, 370), Size = new Size(100, 25) };
             this.nameBox = new TextBox() { Location = new Point(110, 370), Size = new Size(150, 25) };
@@ -163,19 +216,16 @@
             this.categoryBox = new TextBox() { Location = new Point(510, 370), Size = new Size(120, 25) };
             this.qtyLabel = new Label() { Text = "Default Qty:", Location = new Point(640, 370), Size = new Size(90, 25) };
             this.qtyBox = new TextBox() { Location = new Point(730, 370), Size = new Size(40, 25) };
-
             // Buttons
             this.inventoryGridView.Location = new Point(10, 10);
             this.inventoryGridView.Size = new Size(760, 540);
             this.inventoryGridView.AllowUserToAddRows = true;
             this.inventoryGridView.AllowUserToDeleteRows = true;
             this.inventoryGridView.EditMode = DataGridViewEditMode.EditOnEnter;
-
             inventoryContextMenu = new ContextMenuStrip();
             addMenuItem = new ToolStripMenuItem(" Add New Item");
             editMenuItem = new ToolStripMenuItem(" Edit Selected");
             deleteMenuItem = new ToolStripMenuItem(" Delete Selected");
-
             inventoryContextMenu.Items.AddRange(new ToolStripItem[] {
                 addMenuItem, editMenuItem, deleteMenuItem
             });
@@ -189,6 +239,10 @@
 
             // Add tab to TabControl
             tabControl.Controls.Add(this.inventoryTab);
+            // Add controls back to form
+            this.Controls.Clear();
+            this.Controls.Add(this.tabControl);
+            this.ResumeLayout(false);
         }
     }
 }
