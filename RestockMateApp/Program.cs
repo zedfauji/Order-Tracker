@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace RestockMateApp
+namespace RestockMateApp.Forms
 {
     internal static class Program
     {

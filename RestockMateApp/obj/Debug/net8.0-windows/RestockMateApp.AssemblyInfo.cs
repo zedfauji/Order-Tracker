@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RestockMateApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+10c751e24120f83b035f3046e8250156ccbd6aa2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d017659d36cc00b19d62c58e9abe006dd631093")]
 [assembly: System.Reflection.AssemblyProductAttribute("RestockMateApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RestockMateApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

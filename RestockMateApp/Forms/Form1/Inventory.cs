@@ -1,0 +1,1 @@
+// Auto-created: Inventory.cs

@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
 
-namespace RestockMateApp
+namespace RestockMateApp.Forms
 {
     public partial class LoginForm : Form
     {
